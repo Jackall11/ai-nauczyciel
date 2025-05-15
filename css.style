@@ -1,0 +1,600 @@
+/* ==========================================================================
+   Variables & Base Styles
+   ========================================================================== */
+
+   :root {
+    --primary: #7c3aed;
+    --primary-hover: #6d28d9;
+    --secondary: #ec4899;
+    --accent: #f59e0b;
+    --text: #1e293b;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px -10px rgba(124, 58, 237, 0.2);
+    --radius: 20px;
+    --radius-sm: 12px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --font-primary: 'Inter', system-ui, sans-serif;
+    --font-secondary: 'Comfortaa', cursive;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #f8fafc;
+      --background: #0f172a;
+      --surface: #1e293b;
+    }
+  }
+  
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    font-size: 100%; /* Typically 16px */
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: var(--font-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  body.loaded {
+    opacity: 1;
+  }
+  
+  /* Focus state for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px; /* Optional: slightly round the outline */
+  }
+  
+  /* Visually hidden class for accessibility */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+      transition-delay: 0ms !important;
+      animation-delay: 0ms !important;
+    }
+    /* Keep elements visible if animation was for entry */
+     .animated-text span,
+     .feature-card,
+     .teacher-card {
+        opacity: 1;
+        transform: none;
+     }
+  }
+  
+  /* ==========================================================================
+     Layout
+     ========================================================================== */
+  
+  .container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+  
+  /* ==========================================================================
+     Components
+     ========================================================================== */
+  
+  /* Button Component */
+  .btn {
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: var(--transition);
+    text-decoration: none;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-secondary);
+    letter-spacing: 0.5px;
+    line-height: 1; /* Prevent text descenders causing layout shifts */
+    text-align: center;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 14px -2px rgba(124, 58, 237, 0.4);
+  }
+  
+  .btn-primary:hover,
+  .btn-primary:focus-visible {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px -2px rgba(124, 58, 237, 0.5);
+  }
+  
+  .btn-secondary {
+    background-color: var(--surface);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    box-shadow: none;
+  }
+  
+  .btn-secondary:hover,
+  .btn-secondary:focus-visible {
+    background-color: rgba(124, 58, 237, 0.08);
+    transform: translateY(-2px);
+    border-color: var(--primary-hover); /* Ensure border color change on hover too */
+    color: var(--primary-hover);
+  }
+  
+  /* Teacher Card Component */
+  .teacher-card {
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    padding: 2.5rem 2rem;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid rgba(124, 58, 237, 0.1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    opacity: 0;
+    transform: translateY(20px);
+    /* Added for smoother animation start */
+    will-change: transform, opacity, box-shadow, border-color;
+  }
+  
+  .teacher-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+  
+  .teacher-card.selected {
+    border: 2px solid var(--primary);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+  }
+  
+  .teacher-card.selected::after {
+    content: '✓ Wybrany';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .teacher-photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block; /* Prevent extra space below image */
+    margin: 0 auto 1.5rem;
+    border: 5px solid var(--surface); /* Match background */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    will-change: transform, box-shadow; /* Optimize animation */
+  }
+  
+  .teacher-card:hover .teacher-photo {
+    transform: scale(1.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+  
+  .teacher-card h3 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary);
+    font-family: var(--font-secondary);
+    text-align: center;
+  }
+  
+  .teacher-card p {
+    color: var(--text);
+    opacity: 0.9;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+  
+  /* Feature Card Component */
+  .feature-card {
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    transition: var(--transition);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+    box-shadow: var(--shadow-sm);
+    opacity: 0;
+    transform: translateY(20px);
+    text-align: center;
+    /* Added for smoother animation start */
+    will-change: transform, opacity, box-shadow, border-color;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+  
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    display: inline-block; /* Center correctly */
+  }
+  
+  .feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-family: var(--font-secondary);
+  }
+  
+  .feature-card p {
+    color: var(--text);
+    opacity: 0.9;
+  }
+  
+  /* ==========================================================================
+     Sections
+     ========================================================================== */
+  
+  /* Hero Section */
+  .hero {
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 3rem;
+    text-align: center;
+    border: 1px solid rgba(124, 58, 237, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(124, 58, 237, 0.03) 0%, transparent 70%);
+    z-index: 0; /* Ensure it's behind content */
+  }
+  
+  /* Ensure content is above pseudo-element */
+  .hero > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .animated-text {
+    --animation-gap: 0.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--animation-gap);
+    margin-bottom: 2rem;
+    font-size: clamp(2.5rem, 5vw + 1rem, 4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    font-family: var(--font-secondary);
+  }
+  
+  .animated-text span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease-out forwards;
+    will-change: transform, opacity; /* Optimize animation */
+  }
+  
+  /* Define animation */
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Stagger animation delays and specific styles */
+  .animated-text span:nth-child(1) {
+    color: var(--primary);
+    animation-delay: 0.15s;
+  }
+  .animated-text span:nth-child(2) {
+    color: var(--secondary);
+    animation-delay: 0.3s;
+  }
+  .animated-text span:nth-child(3) {
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation-delay: 0.45s;
+  }
+  
+  .lead {
+    font-size: 1.25rem;
+    max-width: 70ch;
+    margin: 0 auto 2.5rem;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+  
+  .cta-wrapper {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  }
+  
+  /* Teachers Section */
+  [aria-labelledby="teachers-heading"] {
+    /* Container for the teachers section */
+  }
+  
+  #teachers-heading {
+    /* Assuming styles are applied via Tailwind classes in HTML, */
+    /* otherwise, style here: */
+     font-size: 1.875rem; /* text-3xl */
+     font-weight: 700; /* font-bold */
+     text-align: center;
+     margin-bottom: 2rem; /* mb-8 */
+     background: linear-gradient(to right, var(--primary), var(--secondary));
+     -webkit-background-clip: text;
+     background-clip: text;
+     color: transparent;
+     font-family: var(--font-secondary);
+  }
+  
+  .teachers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  /* Start Section */
+  #start {
+    display: none; /* Initially hidden, shown via JS */
+    padding: 3rem 2rem;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+  }
+  
+  #start-heading {
+    /* Assuming styles are applied via Tailwind classes in HTML, */
+    /* otherwise, style here: */
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 700; /* font-bold */
+    text-align: center;
+    margin-bottom: 2rem; /* mb-8 */
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .level-selector p {
+    text-align: center;
+    font-style: italic;
+    opacity: 0.7;
+  }
+  
+  /* Features Section */
+  #features {
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.03) 0%, rgba(236, 72, 153, 0.03) 100%);
+    border-radius: var(--radius);
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(124, 58, 237, 0.1);
+  }
+  
+  #features-heading {
+    /* Assuming styles are applied via Tailwind classes in HTML, */
+    /* otherwise, style here: */
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: 700; /* font-bold */
+    text-align: center;
+    margin-bottom: 2rem; /* mb-8 */
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  #features > p.text-lg { /* Targeting the description paragraph */
+    /* Assuming styles are applied via Tailwind classes in HTML, */
+    /* otherwise, style here: */
+    font-size: 1.125rem; /* text-lg */
+    text-align: center;
+    color: var(--text); /* Use CSS var instead of gray-600 */
+    opacity: 0.8; /* Approximating gray-600/gray-300 */
+    max-width: 48rem; /* max-w-3xl */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 3rem; /* mb-12 */
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  /* Pulse animation for selection feedback */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+  
+  
+  /* ==========================================================================
+     Responsive Styles (Using max-width as per original analysis)
+     ========================================================================== */
+  
+  /* Medium screens and down (Tablets) */
+  @media (max-width: 768px) {
+    .animated-text {
+      --animation-gap: 0.5rem;
+      font-size: clamp(2rem, 6vw, 3rem); /* Adjust clamp range */
+    }
+  
+    .animated-text span {
+      transform: translateY(20px); /* Adjust initial animation position */
+    }
+  
+    .teachers-grid,
+    .features-grid {
+      grid-template-columns: 1fr; /* Stack cards */
+      gap: 1.5rem;
+    }
+  
+    .teacher-card {
+      padding: 2rem 1.5rem;
+    }
+  
+    .teacher-photo {
+      width: 140px;
+      height: 140px;
+    }
+  
+    #features {
+      padding: 4rem 1.5rem; /* Adjust padding */
+    }
+  
+    #features > p.text-lg {
+      margin-bottom: 2rem;
+    }
+  
+    .features-grid {
+      margin-top: 2rem;
+    }
+  }
+  
+  /* Small screens and down (Mobiles) */
+  @media (max-width: 640px) {
+    body {
+      padding: 1rem; /* Reduce body padding */
+    }
+  
+    .hero {
+      padding: 3rem 1.5rem; /* Reduce hero padding */
+      margin-bottom: 2rem;
+    }
+  
+    .lead {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+  
+    .cta-wrapper {
+      flex-direction: column; /* Stack buttons */
+      gap: 0.75rem;
+    }
+  
+    .btn {
+      width: 100%; /* Make buttons full width */
+      padding: 0.9rem 1.5rem; /* Adjust button padding */
+    }
+  
+    #teachers-heading,
+    #start-heading,
+    #features-heading {
+       font-size: 1.75rem; /* Adjust heading sizes */
+       margin-bottom: 1.5rem;
+    }
+  
+    #features {
+      padding: 3rem 1rem;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+    }
+  
+    #features > p.text-lg {
+      font-size: 1rem;
+    }
+  
+    .teachers-grid,
+    .features-grid {
+      gap: 1rem;
+    }
+  
+    .teacher-card,
+    .feature-card {
+      padding: 1.5rem;
+    }
+  
+    .teacher-photo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1rem;
+    }
+  
+    .teacher-card h3,
+    .feature-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+  
+    .teacher-card p,
+    .feature-card p {
+      font-size: 1rem;
+    }
+  }
